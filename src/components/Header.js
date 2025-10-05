@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link } from "react-router-dom";
@@ -37,7 +37,9 @@ function Header({ user }) {
         <div>
           {user ? (
             <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-              <span>Привет, {user.email}!</span>
+              <Link to="/profile">
+                Привет, {user.displayName || user.email}!
+              </Link>
               <Link to="/create">Создать мероприятие</Link>
               <Link to="/myevents">Мои мероприятия</Link>
               <button onClick={handleLogout}>Выйти</button>

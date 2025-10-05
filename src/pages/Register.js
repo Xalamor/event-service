@@ -27,6 +27,9 @@ function Register() {
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         createAt: new Date(),
+        displayName: "",
+        bio: "",
+        phone: "",
       });
 
       navigate("/");
