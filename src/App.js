@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import CreateEvent from "./pages/CreateEvent";
 import MyEvents from "./pages/MyEvents";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import "./App.css";
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
             element={user ? <MyEvents user={user} /> : <Navigate to="/login" />}
           />
           <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/edit-profile" element={<EditProfile user={user} />} />
         </Routes>
       </div>
     </Router>

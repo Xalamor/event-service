@@ -1,47 +1,95 @@
-import React, { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
-function CreateEvent({ user }) {
+export default function EditProfile({ user }) {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    date: "",
-    time: "",
-    location: "",
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [newUserData, setNewUserData] = useState({
+    displayName: "",
+    bio: "",
+    phone: "",
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const docRef = await addDoc(collection(db, "events"), {
-        ...formData,
-        creatorId: user.uid,
-        creatorEmail: user.email,
-        createdAt: serverTimestamp(),
-        participants: [],
-        participantsCount: 0,
-      });
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setUserData(data);
+        setNewUserData({
+          displayName: data.displayName || "",
+          bio: data.bio || "",
+          phone: data.phone || "",
+        });
+      }
+      setLoading(false);
+    };
+    fetchUserData();
+  }, [user]);
 
-      console.log("Мероприятие создано с ID:", docRef.id);
-      navigate("/");
-    } catch (error) {
-      console.error("Ошибка при создании мероприятия:", error.message);
-    }
-  };
-
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
-
-    setFormData((prevState) => ({
-      ...prevState,
+    setNewUserData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateDoc(doc(db, "users", user.uid), newUserData);
+      navigate("/profile");
+    } catch (error) {
+      console.error("Ошибка в обновлении данных:", error.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "200px",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            border: "4px solid #f3f3f3",
+            borderTop: "4px solid #3498db",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p
+          style={{
+            color: "#5d6d7e",
+            fontSize: "16px",
+            fontWeight: "500",
+          }}
+        >
+          Загрузка профиля...
+        </p>
+        <style>
+          {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+        </style>
+      </div>
+    );
+  }
   return (
     <div
       style={{
@@ -60,7 +108,7 @@ function CreateEvent({ user }) {
           fontWeight: "600",
         }}
       >
-        Создать мероприятие
+        Редактировать профиль
       </h2>
 
       <form
@@ -83,15 +131,13 @@ function CreateEvent({ user }) {
               fontSize: "14px",
             }}
           >
-            Название мероприятия:
+            Имя:
           </label>
           <input
-            type="text"
-            name="title"
-            value={formData.title}
+            name="displayName"
+            value={newUserData.displayName}
             onChange={handleChange}
-            placeholder="Введите название мероприятия"
-            required
+            placeholder="Введите ваше имя"
             style={{
               width: "100%",
               padding: "12px",
@@ -116,14 +162,13 @@ function CreateEvent({ user }) {
               fontSize: "14px",
             }}
           >
-            Описание мероприятия:
+            О себе:
           </label>
           <textarea
-            name="description"
-            value={formData.description}
+            name="bio"
+            value={newUserData.bio}
             onChange={handleChange}
-            placeholder="Опишите ваше мероприятие..."
-            required
+            placeholder="Расскажите о себе"
             rows="4"
             style={{
               width: "100%",
@@ -135,77 +180,10 @@ function CreateEvent({ user }) {
               transition: "border-color 0.3s ease",
               outline: "none",
               fontFamily: "inherit",
-              minHeight: "100px",
             }}
             onFocus={(e) => (e.target.style.borderColor = "#3498db")}
             onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
           />
-        </div>
-
-        <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-          <div style={{ flex: "1" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                color: "#2c3e50",
-                fontSize: "14px",
-              }}
-            >
-              Дата:
-            </label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                border: "1px solid #dcdfe6",
-                borderRadius: "8px",
-                fontSize: "16px",
-                transition: "border-color 0.3s ease",
-                outline: "none",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#3498db")}
-              onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
-            />
-          </div>
-
-          <div style={{ flex: "1" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                color: "#2c3e50",
-                fontSize: "14px",
-              }}
-            >
-              Время:
-            </label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                border: "1px solid #dcdfe6",
-                borderRadius: "8px",
-                fontSize: "16px",
-                transition: "border-color 0.3s ease",
-                outline: "none",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#3498db")}
-              onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
-            />
-          </div>
         </div>
 
         <div style={{ marginBottom: "30px" }}>
@@ -218,15 +196,13 @@ function CreateEvent({ user }) {
               fontSize: "14px",
             }}
           >
-            Локация:
+            Телефон:
           </label>
           <input
-            type="text"
-            name="location"
-            value={formData.location}
+            name="phone"
+            value={newUserData.phone}
             onChange={handleChange}
-            placeholder="Где будет проходить мероприятие?"
-            required
+            placeholder="+7 (999) 123-45-67"
             style={{
               width: "100%",
               padding: "12px",
@@ -264,11 +240,9 @@ function CreateEvent({ user }) {
             e.target.style.boxShadow = "none";
           }}
         >
-          Создать мероприятие
+          Сохранить изменения
         </button>
       </form>
     </div>
   );
 }
-
-export default CreateEvent;
