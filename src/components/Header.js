@@ -23,7 +23,7 @@ function Header({ user }) {
       >
         <div>
           <Link
-            to="/"
+            to="/event-service"
             style={{
               textDecoration: "none",
               fontSize: "24px",

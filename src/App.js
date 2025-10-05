@@ -39,14 +39,14 @@ function App() {
       <div className="App">
         <Header user={user} />
         <Routes>
-          <Route path="/" element={<Home user={user} />} />
+          <Route path="/event-service" element={<Home user={user} />} />
           <Route
             path="/login"
-            element={!user ? <Login /> : <Navigate to="/" />}
+            element={!user ? <Login /> : <Navigate to="/event-service" />}
           />
           <Route
             path="/register"
-            element={!user ? <Register /> : <Navigate to="/" />}
+            element={!user ? <Register /> : <Navigate to="/event-service" />}
           />
           <Route
             path="/create"
