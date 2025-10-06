@@ -1,0 +1,188 @@
+/* styles/EditProfile.css */
+
+/* Основные стили контейнера */
+.edit-profile-container {
+  padding: clamp(20px, 5vw, 40px);
+  max-width: 500px;
+  margin: 0 auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+}
+
+.edit-profile-title {
+  text-align: center;
+  margin-bottom: clamp(20px, 4vw, 30px);
+  color: #2c3e50;
+  font-size: clamp(24px, 6vw, 28px);
+  font-weight: 600;
+  padding: 0 10px;
+}
+
+/* Стили формы */
+.edit-profile-form {
+  background: white;
+  padding: clamp(20px, 4vw, 30px);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e8ed;
+  margin: 0 10px;
+}
+
+/* Стили полей формы */
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: clamp(12px, 3vw, 14px);
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  outline: none;
+  box-sizing: border-box;
+  min-height: 44px;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  border-color: #3498db;
+}
+
+.form-input.focused {
+  border-color: #3498db;
+}
+
+/* Специфичные стили для textarea */
+.form-input[type="textarea"] {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Стили кнопок */
+.form-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.form-buttons.mobile {
+  flex-direction: column;
+}
+
+.cancel-button {
+  flex: 0 0 auto;
+  padding: clamp(12px, 3vw, 14px);
+  background: transparent;
+  color: #5d6d7e;
+  border: 2px solid #dcdfe6;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-height: 44px;
+}
+
+.cancel-button:hover {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.save-button {
+  flex: 1;
+  padding: clamp(12px, 3vw, 14px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  min-height: 44px;
+}
+
+.save-button:hover:not(.saving) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.save-button.saving {
+  background: #95a5a6;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .edit-profile-container {
+    padding: 20px 15px !important;
+  }
+
+  .edit-profile-form {
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cancel-button {
+    flex: 1;
+  }
+
+  .edit-profile-title {
+    font-size: 22px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .form-input {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .edit-profile-container {
+    padding: 15px 10px !important;
+  }
+
+  .edit-profile-form {
+    padding: 15px !important;
+  }
+
+  .form-input[type="textarea"] {
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 320px) {
+  .edit-profile-title {
+    font-size: 20px !important;
+  }
+
+  .edit-profile-form {
+    padding: 12px !important;
+  }
+}
+
+/* Улучшение для мобильного ввода */
+@media (max-width: 768px) {
+  .form-input {
+    font-size: 16px !important;
+  }
+}
