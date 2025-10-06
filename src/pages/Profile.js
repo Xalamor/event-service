@@ -112,7 +112,7 @@ function Profile({ user }) {
             <Link to="/myevents" className="mobile-action-btn primary">
               Мои мероприятия
             </Link>
-            <Link to="/device-service" className="mobile-action-btn secondary">
+            <Link to="/event-service" className="mobile-action-btn secondary">
               На главную
             </Link>
           </div>
