@@ -15,7 +15,7 @@ import CreateEvent from "./pages/CreateEvent";
 import MyEvents from "./pages/MyEvents";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
-import "./App.css";
+import "./styles/App.css";
 
 function App() {
   const [user, setUser] = useState(null);

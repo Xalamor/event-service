@@ -7,6 +7,7 @@ export default function EditProfile({ user }) {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [newUserData, setNewUserData] = useState({
     displayName: "",
     bio: "",
@@ -40,11 +41,14 @@ export default function EditProfile({ user }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       await updateDoc(doc(db, "users", user.uid), newUserData);
       navigate("/profile");
     } catch (error) {
       console.error("Ошибка в обновлении данных:", error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -58,6 +62,7 @@ export default function EditProfile({ user }) {
           height: "200px",
           flexDirection: "column",
           gap: "20px",
+          padding: "20px",
         }}
       >
         <div
@@ -75,6 +80,7 @@ export default function EditProfile({ user }) {
             color: "#5d6d7e",
             fontSize: "16px",
             fontWeight: "500",
+            textAlign: "center",
           }}
         >
           Загрузка профиля...
@@ -90,22 +96,26 @@ export default function EditProfile({ user }) {
       </div>
     );
   }
+
   return (
     <div
       style={{
-        padding: "40px",
+        padding: "clamp(20px, 5vw, 40px)",
         maxWidth: "500px",
         margin: "0 auto",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        minHeight: "calc(100vh - 80px)",
+        boxSizing: "border-box",
       }}
     >
       <h2
         style={{
           textAlign: "center",
-          marginBottom: "30px",
+          marginBottom: "clamp(20px, 4vw, 30px)",
           color: "#2c3e50",
-          fontSize: "28px",
+          fontSize: "clamp(24px, 6vw, 28px)",
           fontWeight: "600",
+          padding: "0 10px",
         }}
       >
         Редактировать профиль
@@ -115,10 +125,11 @@ export default function EditProfile({ user }) {
         onSubmit={handleSubmit}
         style={{
           background: "white",
-          padding: "30px",
+          padding: "clamp(20px, 4vw, 30px)",
           borderRadius: "12px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           border: "1px solid #e1e8ed",
+          margin: "0 10px",
         }}
       >
         <div style={{ marginBottom: "20px" }}>
@@ -140,12 +151,14 @@ export default function EditProfile({ user }) {
             placeholder="Введите ваше имя"
             style={{
               width: "100%",
-              padding: "12px",
+              padding: "clamp(12px, 3vw, 14px)",
               border: "1px solid #dcdfe6",
               borderRadius: "8px",
               fontSize: "16px",
               transition: "border-color 0.3s ease",
               outline: "none",
+              boxSizing: "border-box",
+              minHeight: "44px",
             }}
             onFocus={(e) => (e.target.style.borderColor = "#3498db")}
             onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
@@ -172,7 +185,7 @@ export default function EditProfile({ user }) {
             rows="4"
             style={{
               width: "100%",
-              padding: "12px",
+              padding: "clamp(12px, 3vw, 14px)",
               border: "1px solid #dcdfe6",
               borderRadius: "8px",
               fontSize: "16px",
@@ -180,6 +193,8 @@ export default function EditProfile({ user }) {
               transition: "border-color 0.3s ease",
               outline: "none",
               fontFamily: "inherit",
+              boxSizing: "border-box",
+              minHeight: "120px",
             }}
             onFocus={(e) => (e.target.style.borderColor = "#3498db")}
             onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
@@ -205,44 +220,161 @@ export default function EditProfile({ user }) {
             placeholder="+7 (999) 123-45-67"
             style={{
               width: "100%",
-              padding: "12px",
+              padding: "clamp(12px, 3vw, 14px)",
               border: "1px solid #dcdfe6",
               borderRadius: "8px",
               fontSize: "16px",
               transition: "border-color 0.3s ease",
               outline: "none",
+              boxSizing: "border-box",
+              minHeight: "44px",
             }}
             onFocus={(e) => (e.target.style.borderColor = "#3498db")}
             onBlur={(e) => (e.target.style.borderColor = "#dcdfe6")}
           />
         </div>
 
-        <button
-          type="submit"
+        <div
           style={{
-            width: "100%",
-            padding: "14px",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
-          }}
-          onMouseOver={(e) => {
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "none";
+            display: "flex",
+            gap: "15px",
+            flexDirection: window.innerWidth <= 480 ? "column" : "row",
           }}
         >
-          Сохранить изменения
-        </button>
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            style={{
+              flex: window.innerWidth <= 480 ? "1" : "0 0 auto",
+              padding: "clamp(12px, 3vw, 14px)",
+              background: "transparent",
+              color: "#5d6d7e",
+              border: "2px solid #dcdfe6",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              textAlign: "center",
+            }}
+            onMouseOver={(e) => {
+              e.target.style.borderColor = "#3498db";
+              e.target.style.color = "#3498db";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.borderColor = "#dcdfe6";
+              e.target.style.color = "#5d6d7e";
+            }}
+          >
+            Отмена
+          </button>
+
+          <button
+            type="submit"
+            disabled={saving}
+            style={{
+              flex: "1",
+              padding: "clamp(12px, 3vw, 14px)",
+              background: saving
+                ? "#95a5a6"
+                : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: saving ? "not-allowed" : "pointer",
+              transition:
+                "transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease",
+              opacity: saving ? 0.7 : 1,
+              minHeight: "44px",
+            }}
+            onMouseOver={(e) => {
+              if (!saving) {
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!saving) {
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "none";
+              }
+            }}
+          >
+            {saving ? "Сохранение..." : "Сохранить изменения"}
+          </button>
+        </div>
       </form>
+
+      <style jsx>{`
+        /* Адаптивные стили через медиа-запросы */
+        @media (max-width: 768px) {
+          div[style*="padding: clamp(20px, 5vw, 40px)"] {
+            padding: 20px 15px !important;
+          }
+
+          form {
+            margin: 0 !important;
+            padding: 20px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          div[style*="display: flex"] {
+            flex-direction: column !important;
+            gap: 10px !important;
+          }
+
+          h2 {
+            font-size: 22px !important;
+            margin-bottom: 20px !important;
+          }
+
+          button {
+            font-size: 15px !important;
+          }
+
+          input,
+          textarea {
+            font-size: 16px !important; /* Предотвращает масштабирование в iOS */
+          }
+        }
+
+        @media (max-width: 360px) {
+          div[style*="padding: clamp(20px, 5vw, 40px)"] {
+            padding: 15px 10px !important;
+          }
+
+          form {
+            padding: 15px !important;
+          }
+
+          textarea {
+            min-height: 100px !important;
+            rows: 3 !important;
+          }
+        }
+
+        /* Улучшение для мобильного ввода */
+        @media (max-width: 768px) {
+          input,
+          textarea {
+            font-size: 16px !important;
+          }
+        }
+
+        /* Улучшение для очень маленьких экранов */
+        @media (max-width: 320px) {
+          h2 {
+            font-size: 20px !important;
+          }
+
+          form {
+            padding: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

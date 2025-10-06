@@ -6,6 +6,16 @@ import { Link } from "react-router-dom";
 function Profile({ user }) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,6 +38,7 @@ function Profile({ user }) {
           height: "200px",
           flexDirection: "column",
           gap: "20px",
+          padding: "20px",
         }}
       >
         <div
@@ -45,6 +56,7 @@ function Profile({ user }) {
             color: "#5d6d7e",
             fontSize: "16px",
             fontWeight: "500",
+            textAlign: "center",
           }}
         >
           Загрузка профиля...
@@ -60,31 +72,37 @@ function Profile({ user }) {
       </div>
     );
   }
+
   return (
     <div
       style={{
-        padding: "40px",
+        padding: "clamp(20px, 5vw, 40px)",
         maxWidth: "600px",
         margin: "0 auto",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        minHeight: "calc(100vh - 80px)",
       }}
     >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-          paddingBottom: "20px",
+          alignItems: isMobile ? "flex-start" : "center",
+          marginBottom: "clamp(20px, 4vw, 30px)",
+          paddingBottom: "clamp(15px, 3vw, 20px)",
           borderBottom: "2px solid #f1f3f4",
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? "15px" : "0",
         }}
       >
         <h2
           style={{
             color: "#2c3e50",
-            fontSize: "28px",
+            fontSize: "clamp(24px, 6vw, 28px)",
             fontWeight: "600",
             margin: 0,
+            textAlign: isMobile ? "center" : "left",
+            width: isMobile ? "100%" : "auto",
           }}
         >
           Мой профиль
@@ -92,23 +110,40 @@ function Profile({ user }) {
         <Link
           to="/edit-profile"
           style={{
-            padding: "10px 20px",
+            padding: "clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px)",
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             color: "white",
             textDecoration: "none",
             borderRadius: "8px",
             fontWeight: "500",
-            fontSize: "14px",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            fontSize: "clamp(13px, 3vw, 14px)",
+            transition: isMobile
+              ? "none"
+              : "transform 0.2s ease, box-shadow 0.2s ease",
+            display: "block",
+            textAlign: "center",
+            width: isMobile ? "100%" : "auto",
+            minHeight: "44px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          onMouseOver={(e) => {
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.15)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "none";
-          }}
+          onMouseOver={
+            isMobile
+              ? undefined
+              : (e) => {
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.15)";
+                }
+          }
+          onMouseOut={
+            isMobile
+              ? undefined
+              : (e) => {
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "none";
+                }
+          }
         >
           Редактировать профиль
         </Link>
@@ -117,34 +152,39 @@ function Profile({ user }) {
       <div
         style={{
           background: "white",
-          padding: "30px",
+          padding: "clamp(20px, 4vw, 30px)",
           borderRadius: "12px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           border: "1px solid #e1e8ed",
+          margin: isMobile ? "0 10px" : "0",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            marginBottom: "25px",
-            paddingBottom: "20px",
+            marginBottom: "clamp(20px, 4vw, 25px)",
+            paddingBottom: "clamp(15px, 3vw, 20px)",
             borderBottom: "1px solid #f1f3f4",
+            flexDirection: isMobile ? "column" : "row",
+            textAlign: isMobile ? "center" : "left",
+            gap: isMobile ? "15px" : "0",
           }}
         >
           <div
             style={{
-              width: "60px",
-              height: "60px",
+              width: "clamp(50px, 10vw, 60px)",
+              height: "clamp(50px, 10vw, 60px)",
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               borderRadius: "50%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: "white",
-              fontSize: "20px",
+              fontSize: "clamp(18px, 4vw, 20px)",
               fontWeight: "600",
-              marginRight: "20px",
+              marginRight: isMobile ? "0" : "20px",
+              flexShrink: 0,
             }}
           >
             {userData?.displayName
@@ -156,7 +196,8 @@ function Profile({ user }) {
               style={{
                 margin: "0 0 5px 0",
                 color: "#2c3e50",
-                fontSize: "20px",
+                fontSize: "clamp(18px, 4vw, 20px)",
+                lineHeight: 1.3,
               }}
             >
               {userData?.displayName || "Пользователь"}
@@ -165,7 +206,8 @@ function Profile({ user }) {
               style={{
                 margin: 0,
                 color: "#7f8c8d",
-                fontSize: "14px",
+                fontSize: "clamp(13px, 3vw, 14px)",
+                wordBreak: "break-word",
               }}
             >
               {user.email}
@@ -173,26 +215,35 @@ function Profile({ user }) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gap: "20px" }}>
+        <div style={{ display: "grid", gap: "clamp(15px, 3vw, 20px)" }}>
           <div
             style={{
               display: "flex",
               alignItems: "flex-start",
-              padding: "15px",
+              padding: "clamp(12px, 3vw, 15px)",
               background: "#f8f9fa",
               borderRadius: "8px",
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "8px" : "0",
             }}
           >
             <div
               style={{
-                minWidth: "100px",
+                minWidth: isMobile ? "auto" : "100px",
                 fontWeight: "600",
                 color: "#2c3e50",
+                fontSize: "clamp(14px, 3vw, 16px)",
               }}
             >
               Имя:
             </div>
-            <div style={{ color: "#34495e" }}>
+            <div
+              style={{
+                color: "#34495e",
+                fontSize: "clamp(14px, 3vw, 16px)",
+                wordBreak: "break-word",
+              }}
+            >
               {userData?.displayName || "Не указано"}
             </div>
           </div>
@@ -201,21 +252,31 @@ function Profile({ user }) {
             style={{
               display: "flex",
               alignItems: "flex-start",
-              padding: "15px",
+              padding: "clamp(12px, 3vw, 15px)",
               background: "#f8f9fa",
               borderRadius: "8px",
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "8px" : "0",
             }}
           >
             <div
               style={{
-                minWidth: "100px",
+                minWidth: isMobile ? "auto" : "100px",
                 fontWeight: "600",
                 color: "#2c3e50",
+                fontSize: "clamp(14px, 3vw, 16px)",
               }}
             >
               О себе:
             </div>
-            <div style={{ color: "#34495e", lineHeight: "1.5" }}>
+            <div
+              style={{
+                color: "#34495e",
+                lineHeight: "1.5",
+                fontSize: "clamp(14px, 3vw, 16px)",
+                wordBreak: "break-word",
+              }}
+            >
               {userData?.bio || "Не указано"}
             </div>
           </div>
@@ -224,21 +285,31 @@ function Profile({ user }) {
             style={{
               display: "flex",
               alignItems: "center",
-              padding: "15px",
+              padding: "clamp(12px, 3vw, 15px)",
               background: "#f8f9fa",
               borderRadius: "8px",
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "8px" : "0",
+              alignItems: isMobile ? "flex-start" : "center",
             }}
           >
             <div
               style={{
-                minWidth: "100px",
+                minWidth: isMobile ? "auto" : "100px",
                 fontWeight: "600",
                 color: "#2c3e50",
+                fontSize: "clamp(14px, 3vw, 16px)",
               }}
             >
               Телефон:
             </div>
-            <div style={{ color: "#34495e" }}>
+            <div
+              style={{
+                color: "#34495e",
+                fontSize: "clamp(14px, 3vw, 16px)",
+                wordBreak: "break-word",
+              }}
+            >
               {userData?.phone || "Не указано"}
             </div>
           </div>
@@ -247,24 +318,142 @@ function Profile({ user }) {
             style={{
               display: "flex",
               alignItems: "center",
-              padding: "15px",
+              padding: "clamp(12px, 3vw, 15px)",
               background: "#f8f9fa",
               borderRadius: "8px",
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? "8px" : "0",
+              alignItems: isMobile ? "flex-start" : "center",
             }}
           >
             <div
               style={{
-                minWidth: "100px",
+                minWidth: isMobile ? "auto" : "100px",
                 fontWeight: "600",
                 color: "#2c3e50",
+                fontSize: "clamp(14px, 3vw, 16px)",
               }}
             >
               Email:
             </div>
-            <div style={{ color: "#34495e" }}>{user.email}</div>
+            <div
+              style={{
+                color: "#34495e",
+                fontSize: "clamp(14px, 3vw, 16px)",
+                wordBreak: "break-word",
+              }}
+            >
+              {user.email}
+            </div>
           </div>
         </div>
+
+        {/* Дополнительные действия для мобильных */}
+        {isMobile && (
+          <div
+            style={{
+              marginTop: "25px",
+              paddingTop: "20px",
+              borderTop: "1px solid #f1f3f4",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
+            <Link
+              to="/myevents"
+              style={{
+                padding: "12px 20px",
+                background: "transparent",
+                color: "#667eea",
+                textDecoration: "none",
+                borderRadius: "8px",
+                fontWeight: "500",
+                fontSize: "14px",
+                border: "2px solid #667eea",
+                textAlign: "center",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = "#667eea";
+                e.target.style.color = "white";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = "transparent";
+                e.target.style.color = "#667eea";
+              }}
+            >
+              Мои мероприятия
+            </Link>
+
+            <Link
+              to="/"
+              style={{
+                padding: "12px 20px",
+                background: "transparent",
+                color: "#7f8c8d",
+                textDecoration: "none",
+                borderRadius: "8px",
+                fontWeight: "500",
+                fontSize: "14px",
+                border: "2px solid #f1f3f4",
+                textAlign: "center",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = "#f1f3f4";
+                e.target.style.color = "#2c3e50";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = "transparent";
+                e.target.style.color = "#7f8c8d";
+              }}
+            >
+              На главную
+            </Link>
+          </div>
+        )}
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          div[style*="padding: clamp(20px, 5vw, 40px)"] {
+            padding: 15px 10px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          div[style*="padding: clamp(20px, 4vw, 30px)"] {
+            padding: 15px !important;
+          }
+
+          div[style*="display: flex"] {
+            padding: 10px !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          div[style*="padding: clamp(20px, 5vw, 40px)"] {
+            padding: 10px !important;
+          }
+
+          div[style*="padding: clamp(20px, 4vw, 30px)"] {
+            padding: 12px !important;
+          }
+        }
+
+        /* Улучшение для очень маленьких экранов */
+        @media (max-width: 320px) {
+          h2 {
+            font-size: 22px !important;
+          }
+
+          div[style*="width: clamp(50px, 10vw, 60px)"] {
+            width: 45px !important;
+            height: 45px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
