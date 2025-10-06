@@ -1,58 +1,160 @@
-// components/EditProfileView.js
-import { useState, useEffect } from "react";
+// pages/EditProfile.js
+import { useEffect, useState } from "react";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
 import "../styles/pages/EditProfile.css";
 
-export default function EditProfileView({
-  newUserData,
-  saving,
-  handleChange,
-  handleSubmit,
-  onCancel,
-}) {
-  const [isMobile, setIsMobile] = useState(false);
+function EditProfile({ user }) {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    displayName: "",
+    bio: "",
+    phone: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 480);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        console.log("Загрузка данных пользователя...");
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          console.log("Данные получены:", data);
+          setFormData({
+            displayName: data.displayName || "",
+            bio: data.bio || "",
+            phone: data.phone || "",
+          });
+        } else {
+          console.log("Документ пользователя не найден");
+          // Если документа нет, используем пустые значения
+          setFormData({
+            displayName: "",
+            bio: "",
+            phone: "",
+          });
+        }
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+        // При ошибке тоже устанавливаем пустые значения
+        setFormData({
+          displayName: "",
+          bio: "",
+          phone: "",
+        });
+      } finally {
+        setLoading(false);
+        console.log("Загрузка завершена");
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), formData);
+      navigate("/profile");
+    } catch (error) {
+      console.error("Ошибка сохранения:", error);
+      alert("Не удалось сохранить изменения");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    navigate("/profile");
+  };
+
+  if (loading) {
+    return (
+      <div className="profile-loading">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">Загрузка профиля...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="edit-profile-container">
-      <h2 className="edit-profile-title">Редактировать профиль</h2>
+      <div className={`edit-profile-header ${isMobile ? "mobile" : ""}`}>
+        <h2 className="edit-profile-title">Редактировать профиль</h2>
+      </div>
 
       <form onSubmit={handleSubmit} className="edit-profile-form">
-        <FormField
-          label="Имя:"
-          name="displayName"
-          value={newUserData.displayName}
-          onChange={handleChange}
-          placeholder="Введите ваше имя"
-          type="text"
-        />
+        <div className="form-field">
+          <label className="form-label">Имя:</label>
+          <input
+            type="text"
+            name="displayName"
+            value={formData.displayName}
+            onChange={handleChange}
+            placeholder="Введите ваше имя"
+            className="form-input"
+          />
+        </div>
 
-        <FormField
-          label="О себе:"
-          name="bio"
-          value={newUserData.bio}
-          onChange={handleChange}
-          placeholder="Расскажите о себе"
-          type="textarea"
-          rows={4}
-        />
+        <div className="form-field">
+          <label className="form-label">О себе:</label>
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            placeholder="Расскажите о себе"
+            rows={4}
+            className="form-input form-textarea"
+          />
+        </div>
 
-        <FormField
-          label="Телефон:"
-          name="phone"
-          value={newUserData.phone}
-          onChange={handleChange}
-          placeholder="+7 (999) 123-45-67"
-          type="text"
-        />
+        <div className="form-field">
+          <label className="form-label">Телефон:</label>
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="+7 (999) 123-45-67"
+            className="form-input"
+          />
+        </div>
 
         <div className={`form-buttons ${isMobile ? "mobile" : ""}`}>
-          <button type="button" onClick={onCancel} className="cancel-button">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="cancel-button"
+            disabled={saving}
+          >
             Отмена
           </button>
 
@@ -69,36 +171,4 @@ export default function EditProfileView({
   );
 }
 
-// Компонент поля формы
-function FormField({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  rows,
-}) {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const inputProps = {
-    name,
-    value,
-    onChange,
-    placeholder,
-    onFocus: () => setIsFocused(true),
-    onBlur: () => setIsFocused(false),
-    className: `form-input ${isFocused ? "focused" : ""}`,
-  };
-
-  return (
-    <div className="form-field">
-      <label className="form-label">{label}</label>
-      {type === "textarea" ? (
-        <textarea {...inputProps} rows={rows} />
-      ) : (
-        <input type={type} {...inputProps} />
-      )}
-    </div>
-  );
-}
+export default EditProfile;

@@ -93,7 +93,7 @@ function Login() {
 
         {isMobile && (
           <div className="mobile-links">
-            <Link to="/" className="back-link">
+            <Link to="/event-device" className="back-link">
               ← Вернуться на главную
             </Link>
           </div>
