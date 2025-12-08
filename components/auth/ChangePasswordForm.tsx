@@ -1,203 +1,173 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
-import { Card, Button } from "@/components/ui";
-import { useRouter } from "next/navigation";
-import EditProfileForm from "@/components/auth/EditProfileForm";
-import ChangePasswordForm from "@/components/auth/ChangePasswordForm";
+import { Button, Input, Card } from "@/components/ui";
 
-const ProfilePage = () => {
-  const { currentUser } = useSelector((state: RootState) => state.user);
-  const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
+// Определяем интерфейс пропсов
+interface ChangePasswordFormProps {
+  onCancel: () => void;
+  onSuccess?: () => void;
+}
 
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="p-8 max-w-md text-center">
-          <div className="text-6xl mb-4">🔒</div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Доступ запрещен
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Для просмотра профиля необходимо авторизоваться
-          </p>
-          <div className="space-y-3">
-            <Button onClick={() => router.push("/login")} className="w-full">
-              Войти в аккаунт
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/register")}
-              className="w-full"
-            >
-              Зарегистрироваться
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+const ChangePasswordForm = ({
+  onCancel,
+  onSuccess,
+}: ChangePasswordFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Функции для обработки кликов
-  const handleEditProfile = () => {
-    setIsEditing(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const [formData, setFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError("");
+    setSuccess("");
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
+  const validateForm = () => {
+    if (!formData.currentPassword.trim()) {
+      setError("Введите текущий пароль");
+      return false;
+    }
+
+    if (!formData.newPassword.trim()) {
+      setError("Введите новый пароль");
+      return false;
+    }
+
+    if (formData.newPassword.length < 6) {
+      setError("Новый пароль должен содержать минимум 6 символов");
+      return false;
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      setError("Новые пароли не совпадают");
+      return false;
+    }
+
+    return true;
   };
 
-  const handlePasswordChange = () => {
-    setShowPasswordForm(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Имитация API запроса
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Здесь будет реальный запрос к API
+      console.log("Changing password:", {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
+
+      setSuccess("Пароль успешно изменен!");
+
+      // Очищаем форму
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      // Вызываем callback успеха
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+      }, 1500);
+    } catch (err) {
+      console.error("Error changing password:", err);
+      setError("Ошибка при смене пароля. Попробуйте еще раз.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="mb-6">
-          <button
-            onClick={() => router.back()}
-            className="text-blue-600 hover:text-blue-800 font-medium flex items-center"
-          >
-            ← Назад
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Боковая панель с информацией */}
-          <div className="lg:col-span-1">
-            <Card className="p-6">
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold mx-auto mb-4">
-                  {currentUser.firstName.charAt(0)}
-                  {currentUser.lastName.charAt(0)}
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {currentUser.firstName} {currentUser.lastName}
-                </h2>
-                <p className="text-gray-600">{currentUser.email}</p>
-                <div className="mt-2">
-                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                    {currentUser.role === "admin"
-                      ? "Администратор"
-                      : "Пользователь"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">ID пользователя:</span>
-                  <span className="font-medium">{currentUser.id}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Роль:</span>
-                  <span className="font-medium capitalize">
-                    {currentUser.role}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t">
-                {!isEditing ? (
-                  <Button onClick={handleEditProfile} className="w-full">
-                    Редактировать профиль
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={handleCancelEdit}
-                    className="w-full"
-                  >
-                    Отменить редактирование
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            <Card className="p-6 mt-6">
-              <h3 className="font-semibold text-gray-900 mb-4">
-                Быстрые действия
-              </h3>
-              <div className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleEditProfile}
-                >
-                  Редактировать профиль
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handlePasswordChange}
-                >
-                  Сменить пароль
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    alert("Настройки уведомлений в разработке");
-                  }}
-                >
-                  Настройки уведомлений
-                </Button>
-              </div>
-            </Card>
-          </div>
-
-          {/* Основной контент */}
-          <div className="lg:col-span-2">
-            {isEditing ? (
-              <EditProfileForm
-                onCancel={handleCancelEdit}
-                onSuccess={handleCancelEdit}
-              />
-            ) : (
-              <>
-                <Card className="p-6 mb-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                      Мой профиль
-                    </h1>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleEditProfile}
-                    >
-                      Редактировать
-                    </Button>
-                  </div>
-
-                  {/* ... остальной контент профиля ... */}
-                </Card>
-
-                {/* ... остальные карточки ... */}
-              </>
-            )}
-          </div>
-        </div>
+    <Card className="p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          Смена пароля
+        </h3>
+        <p className="text-gray-600">Введите текущий пароль и задайте новый</p>
       </div>
 
-      {/* Модальное окно для смены пароля */}
-      {showPasswordForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="max-w-md w-full">
-            <ChangePasswordForm
-              onCancel={() => setShowPasswordForm(false)}
-              onSuccess={() => setShowPasswordForm(false)}
-            />
-          </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {error}
         </div>
       )}
-    </div>
+
+      {success && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+          {success}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Текущий пароль *"
+          name="currentPassword"
+          type="password"
+          placeholder="Введите текущий пароль"
+          value={formData.currentPassword}
+          onChange={handleChange}
+          required
+        />
+
+        <Input
+          label="Новый пароль *"
+          name="newPassword"
+          type="password"
+          placeholder="Минимум 6 символов"
+          value={formData.newPassword}
+          onChange={handleChange}
+          required
+        />
+
+        <Input
+          label="Подтвердите новый пароль *"
+          name="confirmPassword"
+          type="password"
+          placeholder="Повторите новый пароль"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+        />
+
+        <div className="pt-4 flex flex-col sm:flex-row gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+            className="sm:flex-1"
+          >
+            Отмена
+          </Button>
+          <Button type="submit" isLoading={isLoading} className="sm:flex-1">
+            {isLoading ? "Смена пароля..." : "Сменить пароль"}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 };
 
-export default ProfilePage;
+// Экспортируем с типом
+export default ChangePasswordForm;

@@ -56,7 +56,7 @@ const LoginForm = () => {
           email: result.user.email,
           firstName: result.user.first_name,
           lastName: result.user.last_name,
-          role: result.user.is_admin ? "admin" : "user",
+          role: result.user.is_admin ? "organizer" : "user",
         })
       );
 

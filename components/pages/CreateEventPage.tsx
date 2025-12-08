@@ -176,7 +176,7 @@ const CreateEventPage = () => {
         } else if (Array.isArray(err.data)) {
           setError(
             `Ошибки: ${err.data
-              .map((e) => e.message || JSON.stringify(e))
+              .map((e: any) => e.message || JSON.stringify(e))
               .join(", ")}`
           );
         } else {

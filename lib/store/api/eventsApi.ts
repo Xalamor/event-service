@@ -16,6 +16,8 @@ export interface Event {
   category: string;
   image_url: string | null;
   organizer_id: number;
+  is_online?: boolean;
+  price?: number;
 }
 
 // Тип для ответа API (одиночное мероприятие)

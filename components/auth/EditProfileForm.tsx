@@ -22,8 +22,7 @@ const EditProfileForm = ({ onCancel, onSuccess }: EditProfileFormProps) => {
   const [formData, setFormData] = useState({
     firstName: currentUser?.firstName || "",
     lastName: currentUser?.lastName || "",
-    email: currentUser?.email || "",
-    username: currentUser?.username || "", // Добавим если нужно
+    email: currentUser?.email || "", // Добавим если нужно
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

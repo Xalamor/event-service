@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 const FeaturedEvents = () => {
   const featuredEvents = [
     {
-      id: "1",
+      id: 1,
       title: "Frontend Meetup: React 18 и Beyond",
       description:
         "Ежемесячная встреча фронтенд-разработчиков. Обсуждаем последние тенденции в React и экосистеме.",
@@ -18,7 +18,7 @@ const FeaturedEvents = () => {
       currentParticipants: 32,
     },
     {
-      id: "2",
+      id: 2,
       title: "Стартап Пикник: Лето 2024",
       description:
         "Крупнейшее событие для предпринимателей и инвесторов. Питч-сессии, нетворкинг, вдохновляющие истории.",
@@ -30,7 +30,7 @@ const FeaturedEvents = () => {
       currentParticipants: 187,
     },
     {
-      id: "3",
+      id: 3,
       title: "Мастер-класс по цифровой живописи",
       description:
         "Практический воркшоп для начинающих художников. Освойте Procreate под руководством профессионалов.",
@@ -43,12 +43,12 @@ const FeaturedEvents = () => {
     },
   ];
 
-  const handleViewDetails = (eventId: string) => {
+  const handleViewDetails = (eventId: number) => {
     console.log("View details:", eventId);
     // Здесь будет навигация на страницу мероприятия
   };
 
-  const handleRegister = (eventId: string) => {
+  const handleRegister = (eventId: number) => {
     console.log("Register for event:", eventId);
     // Здесь будет логика регистрации
   };

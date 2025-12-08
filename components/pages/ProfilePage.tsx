@@ -64,8 +64,8 @@ const ProfilePage = () => {
                 <p className="text-gray-600">{currentUser.email}</p>
                 <div className="mt-2">
                   <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                    {currentUser.role === "admin"
-                      ? "Администратор"
+                    {currentUser.role === "organizer"
+                      ? "Организатор"
                       : "Пользователь"}
                   </span>
                 </div>
