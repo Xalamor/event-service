@@ -3,17 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLoginMutation } from "@/lib/store/api/authApi";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "@/lib/store/slices/authSlice";
+import { setUser } from "@/lib/store/slices/userSlice";
 import { Button, Input, Card } from "@/components/ui";
 
 const LoginForm = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,28 +30,65 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError("");
 
     if (!formData.email || !formData.password) {
       setError("Все поля обязательны для заполнения");
-      setIsLoading(false);
       return;
     }
 
     try {
-      // Имитация API запроса (позже подключим Redux)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await login(formData).unwrap();
 
-      // Заглушка успешного входа
-      console.log("Login attempt:", formData);
+      console.log("Login successful:", result);
 
-      // Редирект на главную после успешного входа
+      // Сохраняем токен и данные пользователя
+      dispatch(
+        loginSuccess({
+          access: result.token, // Используем result.token
+          refresh: "", // refresh токена нет
+        })
+      );
+
+      dispatch(
+        setUser({
+          id: result.user.id.toString(),
+          email: result.user.email,
+          firstName: result.user.first_name,
+          lastName: result.user.last_name,
+          role: result.user.is_admin ? "admin" : "user",
+        })
+      );
+
+      // Сохраняем только access токен (refresh нет)
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", result.token);
+      }
+
+      // Редирект на главную
       router.push("/");
-    } catch (err) {
-      setError("Ошибка при входе. Проверьте email и пароль.");
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      console.error("Login error:", err);
+
+      if (err.data) {
+        if (err.data.detail) {
+          setError(err.data.detail);
+        } else if (err.data.email) {
+          setError(err.data.email[0]);
+        } else if (err.data.password) {
+          setError(err.data.password[0]);
+        } else if (err.data.message) {
+          setError(err.data.message);
+        } else {
+          setError("Ошибка при входе. Проверьте данные.");
+        }
+      } else if (err.status === 401) {
+        setError("Неверный email или пароль");
+      } else if (err.status === 400) {
+        setError("Неверный формат данных");
+      } else {
+        setError("Ошибка соединения с сервером");
+      }
     }
   };
 

@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// Типы для запросов
 interface LoginRequest {
   email: string;
   password: string;
@@ -7,50 +8,59 @@ interface LoginRequest {
 
 interface RegisterRequest {
   email: string;
+  username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
 }
 
-interface AuthResponse {
+// Типы для ответов
+interface UserData {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  is_admin: boolean;
+}
+
+interface LoginResponse {
+  message: string;
   token: string;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: "user" | "organizer";
-  };
+  user: UserData;
+}
+
+interface RegisterResponse {
+  message: string;
+  token: string;
+  user: UserData;
 }
 
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL + "/api/auth",
+    baseUrl: "https://event-manager-q544.onrender.com/api/v1",
+    prepareHeaders: (headers) => {
+      headers.set("Content-Type", "application/json");
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
-    login: builder.mutation<AuthResponse, LoginRequest>({
+    login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: "/login",
+        url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
     }),
-    register: builder.mutation<AuthResponse, RegisterRequest>({
+    register: builder.mutation<RegisterResponse, RegisterRequest>({
       query: (userData) => ({
-        url: "/register",
+        url: "/auth/register",
         method: "POST",
         body: userData,
-      }),
-    }),
-    logout: builder.mutation<void, void>({
-      query: () => ({
-        url: "/logout",
-        method: "POST",
       }),
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } =
-  authApi;
+export const { useLoginMutation, useRegisterMutation } = authApi;
